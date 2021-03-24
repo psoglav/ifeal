@@ -5,6 +5,8 @@
 </template>
 
 <style lang="scss">
+@import '@/scss/colors';
+
 * {
   margin: 0;
   padding: 0;
@@ -12,7 +14,7 @@
 }
 
 html {
-  background: #000;
+  background: $primary-background;
 }
 
 #app {
@@ -21,6 +23,6 @@ html {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   
-  color: #B5C2C0;
+  color: $primary-foreground;
 }
 </style>
