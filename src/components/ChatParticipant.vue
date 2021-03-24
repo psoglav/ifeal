@@ -80,22 +80,6 @@ export default {
           translateY: [0, -15],
           duration: 100,
           complete() {
-            // if (oldVal == 'out') {
-            // anime({
-            // targets: self.$refs.pAvatar,
-            // scaleY: [0, 1],
-            // filter: ['blur(40px)', 'blur(0px)'],
-            // duration: 1700,
-            // })
-            // } else if(oldVal != 'out' && val == 'out') {
-            // anime({
-            // targets: self.$refs.pAvatar,
-            // scaleY: [0, 1],
-            // filter: ['blur(40px)', 'blur(0px)'],
-            // duration: 1700,
-            // })
-            // }
-
             self.handledStatus = val
             self.$refs.pStatus.className = 'chat-participant-status ' + val
 
