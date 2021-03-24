@@ -25,34 +25,51 @@ export default {
       connectionSegments: 10,
     }
   },
-  mounted() {
-    const self = this
-    const c = this.lightColor
+  methods: {
+    hitParticipant() {
+      const self = this
+      const c = this.lightColor
 
-    anime({
-      targets: self.$refs.oLine.children,
-      boxShadow: [
-        `0 0 100px 0px ${c}`,
-        `0 0 88px 6px ${c}`,
-        `0 0 100px 0px ${c}`,
-      ],
-      duration: 150,
-      loop: true,
-      autoplay: false,
-      delay: anime.stagger(10),
-    })
-    anime({
-      targets: self.$refs.mLine.children,
-      boxShadow: [
-        `0 0 100px 0px ${c}`,
-        `0 0 88px 6px ${c}`,
-        `0 0 100px 0px ${c}`,
-      ],
-      duration: 150,
-      direction: 'reverse',
-      loop: true,
-      delay: anime.stagger(10),
-    })
+      anime({
+        targets: self.$refs.mLine.children,
+        boxShadow: [
+          `0 0 100px 0px ${c}`,
+          `0 0 88px 6px ${c}`,
+          `0 0 100px 0px ${c}`,
+        ],
+        duration: 150,
+        direction: 'reverse',
+        autoplay: false,
+        delay: anime.stagger(10),
+      })
+    },
+    hitMe() {
+      const self = this
+      const c = this.lightColor
+
+      anime({
+        targets: self.$refs.mLine.children,
+        boxShadow: [
+          `0 0 100px 0px ${c}`,
+          `0 0 88px 6px ${c}`,
+          `0 0 100px 0px ${c}`,
+        ],
+        duration: 150,
+        autoplay: true,
+        delay: anime.stagger(10),
+      })
+    },
+  },
+  created() {
+    this.$root.$on('hit-participant', this.hitParticipant)
+    this.$root.$on('hit-me', this.hitMe)
+  },
+  beforeDestroy() {
+    this.$root.$off('hit-participant', this.hitParticipant)
+    this.$root.$off('hit-me', this.hitMe)
+  },
+  mounted() {
+    this.$root.$emit('hit-me')
   },
 }
 </script>

@@ -1,11 +1,9 @@
 <template>
   <div class="chat-participant">
     <div v-show="!me" ref="pName" class="chat-participant-name">{{ name }}</div>
-    <div
-      ref="pAvatar"
-      :class="{ online }"
-      class="chat-participant-avatar"
-    ></div>
+    <div ref="pAvatar" :class="{ online }" class="chat-participant-avatar">
+      <div ref="hitLight" class="chat-participant-avatar_hit-light"></div>
+    </div>
     <div v-show="!me" ref="pStatus" class="chat-participant-status">
       {{ computedStatus }}
       <div
@@ -93,6 +91,11 @@ export default {
 
             self.waitingAnimation.restart()
 
+            if (!self.online) {
+              self.idleAnimation.restart()
+              self.idleAnimation.pause()
+            }
+
             self.handleStatus(val)
           },
         })
@@ -119,15 +122,14 @@ export default {
     },
     handleStatus(status) {
       if (status != 'staring') {
-        this.idleAnimation.restart()
         this.idleAnimation.pause()
         this.stopAnimatingStaringAvatar()
-        if (!this.online) this.goOffline()
       } else {
-        if (this.online) this.goOnline()
         this.startAnimatingStaringAvatar()
-        this.idleAnimation.restart()
       }
+
+      this.idleAnimation.restart()
+      this.adjustLightToOnlineStatus()
     },
     defineAnimations() {
       let self = this
@@ -142,9 +144,9 @@ export default {
 
       this.idleAnimation = anime({
         targets: self.$refs.pStatusIdleSuffix.children,
-        opacity: [0, 1, 0, 1, 1, 1, 1],
-        duration: 2000,
-        loop: true,
+        opacity: [1, 0, 1, 0, 1, 1, 1, 1],
+        duration: 1000,
+        // loop: true,
       })
     },
     startAnimatingStaringAvatar() {
@@ -164,7 +166,7 @@ export default {
           duration: anime.random(800, 1000),
           complete() {
             self.staringAvatarAnimation = null
-            if(!self.mouseControlledLook) self.startAnimatingStaringAvatar()
+            if (!self.mouseControlledLook) self.startAnimatingStaringAvatar()
           },
         })
       } else {
@@ -174,36 +176,27 @@ export default {
     stopAnimatingStaringAvatar() {
       if (this.staringAvatarAnimation) {
         this.staringAvatarAnimation.pause()
-        this.goOnline()
       }
     },
     destroyStaringAvatarAnimation() {
-      if(this.staringAvatarAnimation) {
-        this.staringAvatarAnimation.pause()
-        this.staringAvatarAnimation = null
-      }
+      this.stopAnimatingStaringAvatar()
+      this.staringAvatarAnimation = null
     },
-    setOnline() {
+    adjustLightToOnlineStatus() {
       if (this.online) {
-        this.goOnline()
+        this.$refs.pAvatar.style.transition = 'box-shadow .2s'
+        this.$refs.pAvatar.style.boxShadow = `0 0 7px 5px ${this.lightColor}`
       } else {
-        this.goOffline()
+        this.$refs.pAvatar.style.transition = 'box-shadow .4s'
+        this.$refs.pAvatar.style.boxShadow = `0 0 200px 10px ${this.lightColor}00`
       }
-    },
-    goOnline() {
-      this.$refs.pAvatar.style.transition = 'box-shadow .2s'
-      this.$refs.pAvatar.style.boxShadow = `0 0 7px 5px ${this.lightColor}`
-    },
-    goOffline() {
-      this.$refs.pAvatar.style.transition = 'box-shadow .4s'
-      this.$refs.pAvatar.style.boxShadow = `0 0 200px 10px ${this.lightColor}00`
     },
     mouseMoveHandler(e) {
       this.mouseControlledLook = true
       this.destroyStaringAvatarAnimation()
 
       if (this.status != 'staring') {
-        this.setOnline()
+        this.adjustLightToOnlineStatus()
         return
       }
 
@@ -223,6 +216,31 @@ export default {
       ${mx / 30}px ${my / 30}px ${dist / 12 + 5}px 5px ${this.lightColor},
         0 0 25px 3px ${this.lightColor}`
     },
+    hit() {
+      const self = this
+
+      setTimeout(() => {
+        this.$refs.hitLight.style.boxShadow = `0 0 20px 1px ${this.lightColor}`
+        setTimeout(() => {
+          self.$refs.hitLight.style.transition = 'box-shadow .8s'
+          self.$refs.hitLight.style.boxShadow = `0 0 360px 100px ${this.lightColor}00`
+        }, 100)
+      }, 20)
+    },
+    hitParticipant() {
+      if (!this.me) {
+        this.hit()
+      }
+    },
+    hitMe() {
+      if (this.me) {
+        this.hit()
+      }
+    },
+  },
+  created() {
+    this.$root.$on('hit-participant', this.hitParticipant)
+    this.$root.$on('hit-me', this.hitMe)
   },
   mounted() {
     let self = this
@@ -236,10 +254,12 @@ export default {
         setTimeout(function() {
           self.status = 'typing'
           setTimeout(function() {
+            self.$root.$emit('hit-me')
             self.status = 'staring'
             setTimeout(function() {
               self.status = 'typing'
               setTimeout(function() {
+                self.$root.$emit('hit-me')
                 self.status = 'out'
               }, 5000)
             }, 1000)
@@ -254,6 +274,9 @@ export default {
     if (this.me) {
       document.removeEventListener('mousemove', this.mouseMoveHandler)
     }
+
+    this.$root.$off('hit-participant', this.hitParticipant)
+    this.$root.$off('hit-me', this.hitMe)
   },
 }
 </script>
@@ -290,14 +313,14 @@ export default {
     position: relative;
     // transition: box-shadow 0.4s;
 
-    &::after {
-      content: ' ';
+    &_hit-light {
       position: absolute;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      border: 1px blue solid;
+      border-radius: 100%;
+      box-shadow: 0 0 100px 0 $light;
     }
 
     &.online {
