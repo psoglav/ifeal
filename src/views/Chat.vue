@@ -1,6 +1,6 @@
 <template>
   <div class="chat">
-    <chat-participant status="typing" />
+    <chat-participant name="wwwolfie" status="typing" />
     <div class="connection">
       <div class="connection-bottom-line"></div>
       <div class="connection-top-line"></div>
