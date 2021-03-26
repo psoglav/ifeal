@@ -211,7 +211,7 @@ $msg-hover-time: 0.4s;
           border-radius: 0 $msg-min-radius $msg-max-radius $msg-max-radius;
         }
 
-        &.stacked:first-child {
+        &.stacked:nth-child(2) {
           border-radius: 0 $msg-max-radius $msg-min-radius 0;
         }
       }
@@ -233,7 +233,7 @@ $msg-hover-time: 0.4s;
           border-radius: $msg-min-radius 0 $msg-max-radius $msg-max-radius;
         }
 
-        &.stacked:first-child {
+        &.stacked:nth-child(2) {
           border-radius: $msg-max-radius 0 0 $msg-min-radius;
         }
       }
