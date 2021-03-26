@@ -86,9 +86,12 @@ export default {
     formatTime(ts, expand) {
       const d = moment(ts)
 
-      return expand ? d.format('MMMM Do YYYY, h:mm:ss a') : d.format('LT')
+      return expand ? d.format('MMMM Do YYYY, h:mm a') : d.format('LT')
     },
   },
+  mounted() {
+    this.$scrollTo(this.$el)
+  }
 }
 </script>
 

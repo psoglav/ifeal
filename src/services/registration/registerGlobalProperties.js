@@ -6,6 +6,9 @@ const properties = {
     },
     range(n) {
         return [...Array(n).keys()]
+    },
+    scrollTo(el, top) {
+        el.scrollTop = top ? 0 : el.scrollHeight
     }
 }
 
