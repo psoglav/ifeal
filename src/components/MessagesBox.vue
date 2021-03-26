@@ -97,6 +97,7 @@ export default {
 
 <style lang="scss">
 @import '@/scss/colors';
+@import '@/scss/smart-grid';
 
 $msg-bg: linear-gradient(125deg, $darkness, $subtle-light);
 $opp-msg-bg: linear-gradient(45deg, $subtle-light, $darkness);
@@ -109,6 +110,8 @@ $msg-gap: 5px;
 $stacks-gap: 15px;
 
 $msg-hover-time: 0.4s;
+
+$stack-break: 50rem;
 
 .container {
   position: absolute;
@@ -139,6 +142,14 @@ $msg-hover-time: 0.4s;
       transform-style: preserve-3d;
       perspective-origin: 0% 0%;
       transition: transform 0.2s;
+
+      @include to($stack-break) {
+        width: 100%;
+      }
+
+      @include from($stack-break) {
+        width: 43%;
+      }
 
       &:hover {
         transform: translateY(-10px);
