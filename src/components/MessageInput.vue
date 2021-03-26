@@ -68,24 +68,41 @@ export default {
     enterNewLine() {
       this.input += '\n'
     },
+    inputHeight() {
+      this.inputRect = this.$refs.input.getBoundingClientRect()
+      return this.inputRect.height
+    },
     handleInputFocusEvent() {
       this.inputFocused = true
     },
     handleInputBlurEvent() {
       this.inputFocused = false
     },
-    inputHeight() {
-      this.inputRect = this.$refs.input.getBoundingClientRect()
-      return this.inputRect.height
+    handlePasteEvent(e) {
+      const map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;',
+      }
+
+      const escape_text = text => text.replace(/[&<>"']/g, m => map[m])
+
+      e.preventDefault()
+      var text = (e.originalEvent || e).clipboardData.getData('text/plain')
+      document.execCommand('insertHtml', false, escape_text(text))
     },
   },
   beforeDestroy() {
     this.$refs.input.removeEventListener('focus', this.handleInputFocusEvent)
     this.$refs.input.removeEventListener('blur', this.handleInputBlurEvent)
+    this.$refs.input.removeEventListener('paste', this.handlePasteEvent)
   },
   mounted() {
     this.$refs.input.addEventListener('focus', this.handleInputFocusEvent)
     this.$refs.input.addEventListener('blur', this.handleInputBlurEvent)
+    this.$refs.input.addEventListener('paste', this.handlePasteEvent)
 
     this.initialInputHeight = this.inputHeight()
     this.prevInputHeight = this.inputHeight()
@@ -196,7 +213,7 @@ export default {
     transition: all 0.2s;
 
     &:hover {
-      background-color: $subtle-light;
+      background-color: #3a3f49;
     }
 
     &.hidden {
